@@ -1,183 +1,165 @@
 //Marawan El Sharkawi
 //CSCI 301-Section 1
 //#cs301175
-//Project 3
+//Project 5
 
 /*
-    Recursion is a technique in programming which allows a function to call itself. It is one of the ways to make repeated
-computations. A recursive function passes a smaller version of the problem to a new function of itself then it uses the results
-returned from all the functions it has called to determine the solution of the main problem. This program reads a maze from a
-file displays it then find paths from its start to its end using recursion.
+Ordered lists are lists that holds items all arranged according to the value of each item after the other,
+Linked List data structure is useful to implement ordered lists.This program uses an ordered list ADT in a class with a
+linked list. The program uses this class to get offer a broad range of actions to perform on the list.
 
-    The program uses three data structures:
-•Two integers variables called “r” and “c”, these two integers hold the numbers of rows and columns of the maze respectively
-being read from the file contains the maze.
+ The program uses five data structures:
 
-•Three char variables, one called “lineEnd” to hold the character at the end of the line to start reading a new line.
-The second called “space “which the program uses to print a blank space whenever there is no walls in the maze. And the third one
-is called “path” the program uses it to print a dot whenever there is a path that solves the maze.
+•   One class object with linked lists which has all the required functions to get the actions done chosen by the user.
 
-•A two-dimensional array called “maze”, this array holds very character read from the file, rows of the maze in one of its
- dimensions and columns in the other dimension. A program constant sets the maximum value of the numbers of rows and columns of
- the maze the program can read and find a path through.
+•	Two integer variables in the main program called "quit" which acts like an exit key when incremented and the other called
+ "number" to get the integer input from the user and pass this variable to different functions.
 
-    The program uses four functions:
-•openFile() , it takes ifstream which is a stream class to read from the file contains the maze as a parameter and its being
-passed by reference. The function asks the user to input the name of the file contains the maze to open it, if the name of the
-file does not exist or the user entered a false file name the function keep asking the user to enter the name of the file until
-the users enters a correct file name.
+•   One char variable called "choice" to get the choice of the action the user want to implement on the list.
 
-•readFile(),  it takes ifstream parameter, maze two dimensional array, and two integer variables passed by reference to refer
-to the number of rows and columns of the maze. The function reads the number of rows and columns of the maze from the opened file,
- saves the characters of each row and column of the maze into the two-dimensional array.
+•	Node which is of the building units of the linked lists where each integer lies in a node and a pointer points to that node
+and another points to the next node to form the linked list.
 
-•display(), it takes maze two dimensional array, and two integer variables to refer to the number of rows and columns of the
-maze, the functions prints out the characters saved into the two dimensional array which are the maze read from the file.
+•	Linked lists to hold the content of the ordered list.
 
-•pathFinder(), it takes maze two dimensional array, two integer variables to refer to the dimensions of the start position of
-the maze and two integer variables to refer to the number of rows and columns of the maze. The function finds all the possible
-paths from the start position of the maze till the end position, prints a space whenever there are no walls and prints a dot
-wherever there is a path that will lead to the end of the maze, the function find the paths using recursion technique.
 
-    The program creates an ifstream variable for the file the user will input, two integer variables one to hold the number of the
-rows of the maze and the other to hold the number of columns of the maze, and a maze two-dimensional array. The program then calls
-the openFile() function and passes the ifstream variable as its parameters then calls readFile() function and passes the ifstream
-variable, the maze variable and the two integer variables as its parameters. Next, the program closes the file contains the maze
-after the readFile() function is done with its work, after that it calls display() function and passes the maze variable and
-the two integer variables as its parameters. The final step is to assign the dimension of the start position of the maze
-through the two-dimensional array then to call the pathFinder() function which will find the paths through the maze and
-print out the maze with the paths found.
+The program uses eight functions:
+•	make_list_empty( ):It makes a list which already has integers inside it empty.
+
+•	insert ( const Item& entry ): It takes a constant item passed by reference as a parameter and it inserts the value of that
+item in a list by creating node and saving these values inside them.
+
+•	remove( const Item& entry ): It takes a constant item passed by reference as a parameter and it removes this item from the
+ linked list.
+
+•	length( ): It gets the length of the list (how many items in the list).
+
+•   kth(int k): It gets the value of th kth value in the list.
+
+•	exists( const Item& target ): It take a constant item passed by reference as a parameter and it checks if a given integer
+exists in the list.
+
+•	get_node ( const Item& entry, Node* link ): It takes a constant item passed by reference and a Struct Node as parameter and
+it creates a new node and puts this item in it.
+
+•   menu( ): It prints the menu options for the user to choose from.
+
+The program creates one List class object, two integer variables and one char variable. It shows the user the menu with options
+to choose from and asks the user to choose an option from the list. It read the user's input and apply the action the user
+has chosen on the list, the program after that shows the menu options again and asks the user to choose an action. It repeats
+this process until the user decides to quit the program.The program also checks if the user has entered a wrong menu option
+and asks the user to renter a correct menu option every time the user enters a wrong menu option.
 
 */
 
-
 #include <iostream>
-#include <fstream>
-#include <cstdlib>
-
+#include"Linked_List.h"
 using namespace std;
+void menu(){ //Prints the menu options for the user to choose from,
+            //post-condition: The menu has been printed to the user and the user is ready to choose an action from the menu.
+cout<<endl;
+cout<<"e -- Re-initialize the list to be empty."<<endl;
+cout<<"i -- Insert an integer into the list."<<endl;
+cout<<"r -- Remove certain integer from the list."<<endl;
+cout<<"c -- Check if the list is empty."<<endl;
+cout<<"l -- Check how many integers are in the list."<<endl;
+cout<<"p -- Check if a certain integer is present in the list"<<endl;
+cout<<"k -- Report the kth value in the list."<<endl;
+cout<<"w -- Print out the content of list."<<endl;
+cout<<"h -- See this menu."<<endl;
+cout<<"q -- Quit."<<endl;
+cout<<"Please enter the letter of the command in the list you want to perform: ";
+}
 
-const char space = ' '; //char variable used by the program to print blank spaces.
-const char path = '.'; //char variable used by the program to print dots.
-const int max_rows = 22; // Maximum number of rows in a maze is 22.
-const int max_cols=76;   //Maximum number of columns in a maze is 76.
-
-
-typedef char maze[max_rows][max_cols]; //maze two dimensional array that gets big as the maze.
-
-void openFile (ifstream &File) //File represents a file that contains the maze will be opened to get ready to be read.
-                                // Post-condition: A file named by the used has been opened and ready to be read.
+int main()
 {
-string file; //prepare a string to save the name of the file the user will input.
-  do
-  { cout << "Enter the name of the file contains the maze: ";
-    cin >> file; //Take the user input.
-    File.open(file.c_str()); //open the file the user has entered its name.
-  } while (File.fail()); //Ask the user to enter the name of the file if there is no such file found.
-}
+    List l;
+    int quit=0;
+    int number;
+    char choice;
 
-void readFile(ifstream &file, maze m, int &rows, int &cols) //file represents a file opened that contains the maze.
-    // Post-condition: The two-dimensional array m[][] contains the maze rows and columns including the walls the spaces. And the
-    //maze rows and columns have been returned in the parameters rows and cols.
-{
-  int r, c;
-  char lineEnd;
+    while(quit==0){
+       menu();
+       cin>>choice;
+       cout<<endl;
+       switch(choice){
 
-  file >> r; //read the number of rows of the maze from the file.
-  file >> c; //read the number of columns of the maze from the file.
-  file.get(lineEnd); //Get the end of the line to start reading a new line.
+   case 'e':
+       l.make_empty();
+       cout<<"The list has been re-initialized to be empty successfully."<<endl;
+        break;
 
-  for ( int i=0; i<r; ++i )
-  {
-    for ( int j=0; j<c; ++j )
-      file.get(m[i][j]); //get the characters in the line and save them in the two dimensional array accordingly
-    file.get(lineEnd); //get the end of the line and start reading a new line.
-  }
-  rows = r; //rows of the maze equal the number the program read at the beginning of the file.
-  cols = c; //columns of the maze equal the number the program read at the beginning of the file.
-}
+   case 'i':
+        cout<<"Please enter the integer you want to place in the list: ";
+        cin>>number;
+        l.insert(number);
+        cout<<"The integer has been placed in the list successfully."<<endl;
+        break;
 
-void display (maze m, int rows, int cols) //The two-dimensional array m[][] holds the representation of a maze.
-                                        //Post-condition: The maze representation printed out.
-{
-  for (int i=0; i<rows; ++i)
-  {
-    for (int j=0; j<cols; ++j)
-      cout << m[i][j];
-    cout << endl;
-  }
-  cout << endl;
-}
+   case 'r':
+        cout<<"Please enter the integer you want to remove from the list: ";
+        cin>>number;
+        if(l.exists(number)==true){
+        l.remove(number);
+        cout<<"The integer has been removed from the list successfully."<<endl;
+        }else{
+        cout<<"The integer you entered already is not in the list."<<endl;
+        }
+        break;
 
-bool pathFinder(maze m, int r, int c, int rows, int cols) //The two-dimensional array m[][] holds the representation of a maze.
-//The path has reached position (r,c) which is the start position of the maze and printed dot.
+   case 'c':
+        if(l.empty()==true){
+            cout<<"The list is empty."<<endl;
+        }else{
+            cout<<"The list is not empty."<<endl;
+        }
+        break;
 
-// Post-condition: All the paths to get out of the maze and maze itself have been printed out.
-{
-  if (r == rows - 1) //if the path reached point where r equals the number of rows minus one, display the maze and path found
-                    //It is is base condition.
-    {
-    display(m, rows, cols);
-    return true;
-  }
-  else {
-    if (r > 0 && m[r - 1][c] == space) //Move upwards,If r bigger than zero and the character found in the
-                                //dimension of the point in the two dimensional array m[r-1][c] is a space print a dot there.
-    {
-      m[r - 1][c] = path;
-      if(pathFinder(m, r - 1, c, rows, cols)){ //apply recursion to the function with the new dimensions.
-        return true;
-      }
-      m[r - 1][c] = path; //if the same condition met again print a dot in the blank space.
+   case 'l':
+        cout<<"There are "<<l.length()<<" integer/s in the list."<<endl;
+        break;
+
+   case 'p':
+        cout<<"Please enter the integer you want to check if it is present the list: ";
+        cin>>number;
+        if(l.exists(number)==true){
+            cout<<number<<" is present in the list."<<endl;
+        }else{
+            cout<<number<<" is not present in the list."<<endl;
+        }
+        break;
+
+   case 'k':
+        cout<<"Please enter the kth value you want to know from the list: ";
+        cin>>number;
+        if(l.length()==0){
+            cout<<"There are no integers in the list to show the kth value of."<<endl;
+        }else{
+        cout<<"The "<<number<<"th value in the list is "<<l.kth(number)<<endl;
+        }
+        break;
+
+   case 'w':
+       if(l.length()!=0){
+        cout<<"The list: "<<l<<endl;
+       }else{
+       cout<<"There are no elements in the list to print out."<<endl;
+       }
+        break;
+
+   case 'h': break;
+
+   case 'q':
+        cout<<"Thanks for using the List program come back again :)"<<endl;
+        quit++;
+        break;
+
+   default :
+        cout<<"You entered a letter choice not from the choices in the list please enter a valid letter option."<<endl;
+
+       }
+
     }
-    if (m[r + 1][c] == space) //Move downwards,If r bigger than zero and the character found in the
-                                //dimension of the point in the two dimensional array m[r+1][c] is a space print a dot there.
-    {
-      m[r + 1][c] = path;
-      if(pathFinder(m, r + 1, c, rows, cols)) { //apply recursion to the function with the new dimensions.
-        return true;
-      }
-      m[r + 1][c] = path; //if the same condition met again print a dot in the blank space.
-    }
-    if (m[r][c - 1] == space) //Move left,If the character found in the dimension of the point in the two dimensional
-                            //array m[r][c-1] is a space print a dot there.
-    {
-      m[r][c - 1] = path;
-      if(pathFinder(m, r, c - 1, rows, cols)) { //apply recursion to the function with the new dimensions.
-        return true;
-      }
-      m[r][c - 1] = path; //if the same condition met again print a dot in the blank space.
-    }
-    if (m[r][c + 1] == space) //Move right,If the character found in the dimension of the point in the two dimensional
-                            //array m[r][c+1] is a space print a dot there.
-    {
-      m[r][c + 1] = path;
-      if(pathFinder(m, r, c + 1, rows, cols)) { //apply recursion to the function with the new dimensions.
-        return true;
-      }
-      m[r][c + 1] = path; //if the same condition met again print a dot in the blank space.
-    }
-  }
-  return false; //if anything else other than the above conditions happened return false.
+
+    return 0;
 }
-
-int main(){
-
-
- ifstream File; //prepare a variable to be the file the program will read.
-  int rows, cols; //The number of rows and columns of the maze.
-  maze m; //prepare a two dimensional array to hold the maze characters.
-
-  openFile(File); //open the file contains the maze.
-  readFile(File, m, rows, cols); //read the file contains the maze
-  File.close(); //close the file contains the maze after finishing reading it.
-  cout<<"Maze display: "<<endl;
-  display(m,rows,cols); //print out the maze.
-
-  cout<<"Maze path found: "<<endl;
-    m[0][1] = path; //set the start position of the maze.
-  pathFinder(m,0,1,rows,cols); //find all the possible paths from the start to the end position of the maze and print them out.
-
-return 0;
-}
-
